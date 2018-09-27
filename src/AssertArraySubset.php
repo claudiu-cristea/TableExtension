@@ -23,12 +23,12 @@ class AssertArraySubset
     /**
      * @var array
      */
-    private $subset;
+    protected $subset;
 
     /**
      * @var bool
      */
-    private $strict;
+    protected $strict;
 
     public function __construct(array $subset, bool $strict = false)
     {
@@ -58,19 +58,19 @@ class AssertArraySubset
         }
     }
 
-    private function isAssociative(array $array): bool
+    protected function isAssociative(array $array): bool
     {
         return \array_reduce(\array_keys($array), function (bool $carry, $key): bool {
             return $carry || \is_string($key);
         }, false);
     }
 
-    private function compare($first, $second): bool
+    protected function compare($first, $second): bool
     {
         return $this->strict ? $first === $second : $first == $second;
     }
 
-    private function deepSort(array &$array): void
+    protected function deepSort(array &$array): void
     {
         foreach ($array as &$value) {
             if (\is_array($value)) {
@@ -85,7 +85,7 @@ class AssertArraySubset
         }
     }
 
-    private function arrayIntersectRecursive(array $array, array $subset): array
+    protected function arrayIntersectRecursive(array $array, array $subset): array
     {
         $intersect = [];
 

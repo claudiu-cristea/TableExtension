@@ -6,7 +6,9 @@ namespace LoversOfBehat\TableExtension\Context;
 
 use Behat\Gherkin\Node\TableNode;
 use LoversOfBehat\TableExtension\AssertArraySubset;
+use LoversOfBehat\TableExtension\AssertOrderedArraySubset;
 use LoversOfBehat\TableExtension\Exception\NoArraySubsetException;
+use LoversOfBehat\TableExtension\Exception\NoOrderedArraySubsetException;
 use LoversOfBehat\TableExtension\Exception\TableNotFoundException;
 
 class TableContext extends RawTableContext
@@ -250,6 +252,22 @@ class TableContext extends RawTableContext
     }
 
     /**
+     * Checks that the given table contains the given consecutive rows of non-consecutive columns, identified by header.
+     *
+     * @param string $name
+     *   The human readable name for the table.
+     * @param TableNode $data
+     *   The data that is expected to be present in the table, with the first row identifying the columns to match.
+     *
+     * @Then the :name table should contain the following column(s) with the rows in the specified order:
+     */
+    public function assertOrderedTableColumnData(string $name, TableNode $data): void
+    {
+        $table = $this->getTable($name);
+        $this->assertOrderedArraySubset($data->getColumnsHash(), array_values($table->getColumnData($data->getRow(0))));
+    }
+
+    /**
      * Checks that the given table does not contain the given non-consecutive columns, identified by headers.
      *
      * @param string $name
@@ -353,6 +371,25 @@ class TableContext extends RawTableContext
     protected function assertArraySubset(array $subset, array $array, bool $strict = false): void
     {
         $assert = new AssertArraySubset($subset, $strict);
+        $assert->evaluate($array);
+    }
+
+    /**
+     * Checks that the given array contains the given subset in the given order.
+     *
+     * @param array $subset
+     *   The subset that is expected to exist in the array.
+     * @param array $array
+     *   The array.
+     * @param bool $strict
+     *   Whether to perform strict data type checking when comparing the two arrays.
+     *
+     * @throws NoOrderedArraySubsetException
+     * @throws NoArraySubsetException
+     */
+    protected function assertOrderedArraySubset(array $subset, array $array, bool $strict = false): void
+    {
+        $assert = new AssertOrderedArraySubset($subset, $strict);
         $assert->evaluate($array);
     }
 }
